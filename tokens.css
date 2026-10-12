@@ -1,0 +1,105 @@
+/* =====================================================================
+   100x Fitness — design tokens (source of truth for web specimens;
+   flutter/app_theme.dart mirrors these values).
+
+   Bind components to SEMANTIC names (--canvas, --ink, --metric-heart …),
+   never to literal hex. Dark mode: <html data-mode="dark">, or follows
+   the OS when no attribute is set.
+   ===================================================================== */
+
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
+
+:root {
+  /* Brand */
+  --brand:          #2A6FD6;   /* 100x Blue */
+  --brand-strong:   #1F56AD;
+  --brand-soft:     #DCE8FA;
+  --on-brand:       #FFFFFF;
+  --sky-top:        #2F6BD0;   /* home gradient */
+  --sky-bottom:     #8EC3F0;
+
+  /* Surfaces & text */
+  --canvas:         #F6F5FB;   /* lavender-white */
+  --card:           #FFFFFF;
+  --card-sunk:      #F0EFF6;
+  --ink:            #14152A;
+  --ink-soft:       #3A3C55;
+  --muted:          #6B6F86;
+  --line:           #E6E5EF;
+  --glass:          rgba(255, 255, 255, 0.72);
+  --scrim:          rgba(20, 21, 42, 0.45);
+
+  /* Metric hues — ALWAYS paired with a label or icon, never colour alone */
+  --metric-move:    #2FD15B;
+  --metric-move-2:  #7BE03A;
+  --metric-move-3:  #22C3E6;
+  --metric-heart:   #E0243A;
+  --metric-sleep:   #4B16D9;
+  --metric-effort:  #8C96A8;
+  --metric-breathe: #14B8A6;
+  --tile-move-bg:   #0B0B0F;   /* Activity tile is black, rings carry the colour */
+
+  /* Status (paired with words: "Usual for you", "Below your usual", "Not synced") */
+  --status-ok:      #1F9D55;
+  --status-watch:   #C77700;
+  --status-gap:     #8A8FA3;
+  --insight-edge:   linear-gradient(120deg, #FFB4C6, #FFE29A, #B8F0D0, #B9C9FF);
+
+  /* Type */
+  --font-ui:        "Inter", "SF Pro Text", system-ui, sans-serif;
+  --font-display:   "Inter", "SF Pro Display", system-ui, sans-serif;
+  --num:            "tnum" 1, "lnum" 1;   /* tabular numerals for every value */
+
+  --t-hero:         300 64px/1 var(--font-display);    /* glyph numerals */
+  --t-display:      600 28px/1.15 var(--font-display); /* page title / date */
+  --t-title:        600 20px/1.25 var(--font-ui);
+  --t-value:        500 24px/1.1 var(--font-ui);       /* metric value */
+  --t-body:         400 15px/1.45 var(--font-ui);
+  --t-label:        500 13px/1.3 var(--font-ui);
+  --t-caps:         600 11px/1.2 var(--font-ui);       /* RESTING / RANGE */
+  --unit-scale:     0.55;                               /* units ≈55 % of value */
+
+  /* Shape */
+  --r-tile:         28px;
+  --r-card:         20px;
+  --r-chip:         999px;
+  --r-sheet:        28px;
+
+  /* Spacing (4-pt grid) */
+  --s-1: 4px;  --s-2: 8px;  --s-3: 12px; --s-4: 16px;
+  --s-5: 20px; --s-6: 24px; --s-8: 32px; --s-10: 40px;
+  --gutter:         16px;
+  --tap:            48px;      /* minimum touch target */
+
+  /* Elevation */
+  --e-card:         0 1px 2px rgba(20,21,42,.04), 0 6px 20px rgba(20,21,42,.06);
+  --e-float:        0 8px 30px rgba(20,21,42,.14);
+  --e-tile:         0 10px 24px rgba(10,30,80,.22);
+
+  /* Motion */
+  --ease-emph:      cubic-bezier(.2, 0, 0, 1);
+  --d-zoom:         350ms;     /* tile → detail container transform */
+  --d-quick:        180ms;
+}
+
+/* Dark mode: near-black canvas, tiles stay saturated */
+:root[data-mode="dark"] {
+  --canvas:   #0B0C14;  --card: #161826;  --card-sunk: #1E2133;
+  --ink:      #F2F3FA;  --ink-soft: #C9CBDB; --muted: #8E92AB; --line: #262A3E;
+  --glass:    rgba(22, 24, 38, 0.72);
+  --brand-soft: #16284A;  --brand-strong: #8DB4F5;
+  --sky-top:  #0E2A5C;  --sky-bottom: #1D4E8F;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-mode="light"]) {
+    --canvas:   #0B0C14;  --card: #161826;  --card-sunk: #1E2133;
+    --ink:      #F2F3FA;  --ink-soft: #C9CBDB; --muted: #8E92AB; --line: #262A3E;
+    --glass:    rgba(22, 24, 38, 0.72);
+    --brand-soft: #16284A;  --brand-strong: #8DB4F5;
+    --sky-top:  #0E2A5C;  --sky-bottom: #1D4E8F;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root { --d-zoom: 0ms; --d-quick: 0ms; }
+}

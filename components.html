@@ -1,0 +1,430 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>100x Fitness — Components & Screens</title>
+<link rel="stylesheet" href="tokens.css">
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--canvas); color: var(--ink); font: var(--t-body); font-feature-settings: var(--num); -webkit-font-smoothing: antialiased; }
+  .page { max-width: 1240px; margin: 0 auto; padding: 40px var(--gutter) 80px; }
+  h1 { font: 700 34px/1.1 var(--font-display); margin: 0 0 6px; }
+  h2 { font: var(--t-title); margin: 56px 0 16px; padding-top: 16px; border-top: 1px solid var(--line); }
+  h3 { font: var(--t-caps); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin: 24px 0 10px; }
+  .lede { color: var(--muted); max-width: 70ch; margin: 0; }
+  .row { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start; }
+  .unit { font-size: calc(1em * var(--unit-scale)); color: inherit; opacity: .7; font-weight: 400; margin-left: 2px; }
+
+  /* ---------- swatches ---------- */
+  .sw { width: 132px; border-radius: 14px; overflow: hidden; background: var(--card); box-shadow: var(--e-card); font: var(--t-label); }
+  .sw i { display: block; height: 56px; }
+  .sw span { display: block; padding: 8px 10px; }
+  .sw small { display: block; color: var(--muted); font-weight: 400; }
+
+  /* ---------- hero tiles (Trackable) ---------- */
+  .tile { width: 168px; height: 196px; border-radius: var(--r-tile); padding: 14px 14px 12px; color: #fff; box-shadow: var(--e-tile); display: flex; flex-direction: column; justify-content: space-between; cursor: pointer; transition: transform var(--d-quick) var(--ease-emph); }
+  .tile:active { transform: scale(.97); }
+  .tile .glyph { flex: 1; display: grid; place-items: center; position: relative; }
+  .tile .glyph b { position: absolute; font: var(--t-hero); font-size: 40px; letter-spacing: -.02em; text-align: center; line-height: 1; }
+  .tile .glyph b small { display: block; font: 500 12px/1.3 var(--font-ui); opacity: .85; letter-spacing: 0; }
+  .tile dl { margin: 0; display: grid; grid-template-columns: 1fr auto; row-gap: 2px; font: 500 12.5px/1.35 var(--font-ui); }
+  .tile dt { opacity: .7; } .tile dd { margin: 0; text-align: right; }
+  .t-move { background: var(--tile-move-bg); }
+  .t-heart { background: var(--metric-heart); }
+  .t-sleep { background: var(--metric-sleep); }
+  .t-breathe { background: linear-gradient(160deg, #19C2AE, #0E8F86); }
+  .t-gap .glyph b { font: 500 15px/1 var(--font-ui); opacity: .8; }
+
+  /* ---------- date strip (Trackable) ---------- */
+  .today-pill { display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 16px; border-radius: var(--r-chip); background: var(--glass); backdrop-filter: blur(12px); font: 600 15px/1 var(--font-ui); color: var(--ink); box-shadow: var(--e-card); }
+  .dates { display: flex; gap: 6px; padding: 6px; border-radius: 22px; background: var(--glass); backdrop-filter: blur(14px); width: max-content; }
+  .date { width: 50px; height: 58px; border-radius: 16px; background: var(--glass); display: grid; place-content: center; text-align: center; color: var(--ink-soft); }
+  .date small { font: 600 11px/1 var(--font-ui); color: var(--muted); }
+  .date b { font: 400 24px/1.1 var(--font-display); }
+  .date.on { background: var(--card); box-shadow: var(--e-card); transform: translateY(-3px); color: var(--ink); }
+  .date.on b { font-weight: 600; }
+
+  /* ---------- cards (Bevel) ---------- */
+  .card { background: var(--card); border-radius: var(--r-card); box-shadow: var(--e-card); padding: var(--s-4); }
+  .metric { display: grid; grid-template-columns: 1fr 120px; align-items: center; gap: 8px; width: 358px; }
+  .metric .lbl { font: var(--t-label); color: var(--muted); display: flex; gap: 6px; align-items: center; }
+  .metric .val { font: var(--t-value); margin: 4px 0 2px; }
+  .metric .st { font: var(--t-label); display: flex; gap: 5px; align-items: center; }
+  .st.ok { color: var(--status-ok); } .st.watch { color: var(--status-watch); } .st.gap { color: var(--status-gap); }
+
+  .insight { position: relative; width: 358px; padding: 16px 18px; border-radius: var(--r-card); background: var(--card); box-shadow: var(--e-card); }
+  .insight::before { content: ""; position: absolute; inset: 0; border-radius: inherit; padding: 1.5px; background: var(--insight-edge); -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; }
+  .insight h4 { margin: 0 0 6px; font: 600 15px/1.3 var(--font-ui); }
+  .insight p { margin: 0; color: var(--ink-soft); }
+  .insight .src { margin-top: 10px; font: var(--t-label); color: var(--muted); }
+  .linkrow { width: 358px; display: flex; justify-content: space-between; align-items: center; padding: 14px 18px; font: 600 15px/1 var(--font-ui); }
+
+  .nodata { width: 358px; display: flex; justify-content: space-between; align-items: center; padding: 12px 14px; border-radius: 14px; background: #FFF6EC; color: #B45309; font: 600 14px/1.2 var(--font-ui); border: 1px solid #FBE3C4; }
+
+  .trio { display: grid; grid-template-columns: repeat(3, 1fr); width: 358px; gap: 8px; }
+  .trio div small { display: block; font: var(--t-caps); letter-spacing: .05em; opacity: .75; }
+  .trio div b { font: 400 26px/1.2 var(--font-display); }
+
+  /* ---------- nav (Bevel) ---------- */
+  .navwrap { display: flex; gap: 10px; align-items: center; }
+  .nav { display: flex; gap: 2px; padding: 6px; border-radius: 30px; background: var(--glass); backdrop-filter: blur(16px); box-shadow: var(--e-float); }
+  .nav a { width: 72px; height: 52px; border-radius: 24px; display: grid; place-content: center; justify-items: center; gap: 3px; font: 500 11px/1 var(--font-ui); color: var(--ink-soft); text-decoration: none; }
+  .nav a.on { background: rgba(20,21,42,.07); color: var(--ink); font-weight: 600; }
+  .fab { width: 60px; height: 60px; border-radius: 50%; background: var(--glass); backdrop-filter: blur(16px); box-shadow: var(--e-float); display: grid; place-items: center; font: 300 30px/1 var(--font-ui); color: var(--ink); border: 0; }
+
+  .sheet { width: 358px; padding: 18px 12px 12px; border-radius: var(--r-sheet); background: var(--glass); backdrop-filter: blur(20px); box-shadow: var(--e-float); display: grid; grid-template-columns: repeat(3, 1fr); row-gap: 14px; }
+  .qa { display: grid; justify-items: center; gap: 6px; font: 500 12px/1.2 var(--font-ui); color: var(--ink-soft); text-align: center; }
+  .qa i { width: 52px; height: 52px; border-radius: 50%; background: var(--card); box-shadow: var(--e-card); display: grid; place-items: center; font-style: normal; font-size: 22px; }
+  .qa.ai i { background: radial-gradient(circle at 35% 30%, #fff, #CFE0FF 45%, #B6F0E2 75%, #FFD9E6); }
+
+  /* ---------- booking ---------- */
+  .svc { width: 358px; display: grid; grid-template-columns: 56px 1fr auto; gap: 12px; align-items: center; }
+  .svc .ic { width: 56px; height: 56px; border-radius: 16px; display: grid; place-items: center; font-size: 26px; color: #14152A; }
+  .svc h4 { margin: 0; font: 600 15px/1.3 var(--font-ui); }
+  .svc p { margin: 2px 0 0; color: var(--muted); font: var(--t-label); }
+  .svc .price { font: 600 15px/1 var(--font-ui); text-align: right; }
+  .svc .price small { display: block; margin-top: 4px; font: 500 11px/1 var(--font-ui); color: var(--muted); }
+  .slots { width: 358px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .slot { height: var(--tap); border-radius: 14px; border: 1px solid var(--line); background: var(--card); display: grid; place-content: center; text-align: center; font: 600 14px/1.1 var(--font-ui); }
+  .slot small { font: 500 10.5px/1.2 var(--font-ui); color: var(--muted); }
+  .slot.on { background: var(--brand); border-color: var(--brand); color: var(--on-brand); }
+  .slot.on small { color: rgba(255,255,255,.8); }
+  .slot.full { background: var(--card-sunk); color: var(--muted); text-decoration: line-through; }
+  .booking { width: 358px; display: grid; grid-template-columns: 64px 1fr; gap: 14px; align-items: center; }
+  .booking .when { height: 72px; border-radius: 16px; background: var(--brand-soft); color: var(--brand-strong); display: grid; place-content: center; text-align: center; }
+  .booking .when small { font: var(--t-caps); } .booking .when b { font: 600 26px/1 var(--font-display); }
+  .booking h4 { margin: 0; font: 600 15px/1.3 var(--font-ui); }
+  .booking p { margin: 2px 0 0; font: var(--t-label); color: var(--muted); }
+  .btn { height: 52px; border-radius: var(--r-chip); border: 0; padding: 0 22px; font: 600 16px/1 var(--font-ui); display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+  .btn.primary { background: var(--ink); color: var(--canvas); } .btn.brand { background: var(--brand); color: #fff; }
+  .btn.ghost { background: var(--card-sunk); color: var(--ink); } .btn.wide { width: 358px; }
+
+  /* ---------- circles ---------- */
+  .lb { width: 358px; padding: 6px 0; }
+  .lbr { display: grid; grid-template-columns: 28px 36px 1fr auto; gap: 10px; align-items: center; padding: 10px 16px; }
+  .lbr + .lbr { border-top: 1px solid var(--line); }
+  .lbr .rk { font: 600 14px/1 var(--font-ui); color: var(--muted); text-align: center; }
+  .lbr .av { width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; font: 600 13px/1 var(--font-ui); color: #fff; }
+  .lbr .nm { font: 600 14.5px/1.2 var(--font-ui); } .lbr .nm small { display: block; font: 500 12px/1.3 var(--font-ui); color: var(--muted); }
+  .lbr .v { font: 600 15px/1 var(--font-ui); text-align: right; }
+  .lbr.me { background: var(--brand-soft); }
+  .seg { display: inline-flex; padding: 4px; border-radius: var(--r-chip); background: var(--card-sunk); gap: 2px; }
+  .seg span { padding: 8px 14px; border-radius: var(--r-chip); font: 600 13px/1 var(--font-ui); color: var(--muted); }
+  .seg span.on { background: var(--card); color: var(--ink); box-shadow: var(--e-card); }
+  .privacy { width: 358px; font: var(--t-label); color: var(--muted); display: flex; gap: 8px; }
+
+  /* ---------- breathe ---------- */
+  .orbstage { width: 358px; height: 320px; border-radius: var(--r-tile); background: radial-gradient(120% 90% at 50% 20%, #2BC8B4 0%, #0E6E73 55%, #0A3A4A 100%); display: grid; place-items: center; color: #fff; position: relative; overflow: hidden; }
+  .orb { width: 150px; height: 150px; border-radius: 50%; background: radial-gradient(circle at 40% 35%, rgba(255,255,255,.95), rgba(190,255,240,.55) 45%, rgba(255,255,255,.08) 72%); box-shadow: 0 0 60px rgba(160,255,235,.45); animation: breathe 16s var(--ease-emph) infinite; }
+  @keyframes breathe { 0%,100% { transform: scale(.72) } 25% { transform: scale(1.08) } 50% { transform: scale(1.08) } 75% { transform: scale(.72) } }
+  @media (prefers-reduced-motion: reduce) { .orb { animation: none; } }
+  .orbstage .phase { position: absolute; bottom: 26px; text-align: center; }
+  .orbstage .phase b { display: block; font: 600 22px/1.2 var(--font-display); }
+  .orbstage .phase small { font: var(--t-label); opacity: .8; }
+  .pattern { display: flex; gap: 8px; }
+  .chip { height: 36px; padding: 0 14px; border-radius: var(--r-chip); background: var(--card); box-shadow: var(--e-card); display: inline-flex; align-items: center; font: 600 13px/1 var(--font-ui); }
+  .chip.on { background: var(--metric-breathe); color: #fff; }
+
+  /* ---------- chat ---------- */
+  .chat { width: 358px; display: grid; gap: 10px; }
+  .msg { max-width: 82%; padding: 12px 14px; border-radius: 20px; font: var(--t-body); }
+  .msg.me { justify-self: end; background: var(--brand); color: #fff; border-bottom-right-radius: 6px; }
+  .msg.ai { background: var(--card); box-shadow: var(--e-card); border-bottom-left-radius: 6px; }
+  .msg.ai .cite { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+  .msg.ai .cite span { font: 500 11.5px/1 var(--font-ui); padding: 6px 8px; border-radius: 10px; background: var(--card-sunk); color: var(--ink-soft); }
+  .guard { width: 358px; font: var(--t-label); color: var(--muted); text-align: center; }
+  .emerg { width: 358px; padding: 14px; border-radius: 16px; background: #FDECEE; color: #9F1239; font: 600 14px/1.4 var(--font-ui); }
+  .sugg { display: flex; gap: 8px; flex-wrap: wrap; width: 358px; }
+
+  /* ---------- consent ---------- */
+  .consent { width: 358px; display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: center; }
+  .consent h4 { margin: 0; font: 600 15px/1.3 var(--font-ui); } .consent p { margin: 2px 0 0; font: var(--t-label); color: var(--muted); }
+  .tog { width: 51px; height: 31px; border-radius: 99px; background: var(--status-ok); position: relative; }
+  .tog::after { content: ""; position: absolute; top: 2px; right: 2px; width: 27px; height: 27px; border-radius: 50%; background: #fff; box-shadow: 0 2px 4px rgba(0,0,0,.2); }
+  .tog.off { background: #D7D8E2; } .tog.off::after { right: auto; left: 2px; }
+
+  /* ---------- phone frames ---------- */
+  .phones { display: flex; flex-wrap: wrap; gap: 28px; }
+  .phone { width: 390px; height: 844px; border-radius: 48px; overflow: hidden; position: relative; background: var(--canvas); box-shadow: 0 30px 60px rgba(20,21,42,.18), 0 0 0 10px #101119; flex: none; }
+  .phone .sb { height: 50px; display: flex; justify-content: space-between; align-items: flex-end; padding: 0 30px 8px; font: 600 15px/1 var(--font-ui); }
+  .phone .body { padding: 8px var(--gutter) 120px; display: grid; gap: 12px; justify-items: center; height: calc(100% - 50px); overflow: hidden; align-content: start; }
+  .phone .dock { position: absolute; left: 0; right: 0; bottom: 22px; display: flex; justify-content: center; }
+  .phone.sky { background: linear-gradient(180deg, var(--sky-top), var(--sky-bottom)); color: #fff; }
+  .phone.sky .sb { color: #fff; }
+  .hello { display: grid; justify-items: center; gap: 4px; margin: 0; }
+  .hello .av { width: 48px; height: 48px; border-radius: 50%; background: rgba(10,40,110,.55); display: grid; place-items: center; font: 600 22px/1 var(--font-ui); }
+  .hello .nm { height: 30px; padding: 0 14px; border-radius: 99px; background: var(--glass); color: var(--ink); display: inline-flex; align-items: center; font: 600 15px/1 var(--font-ui); }
+  .grid2 { display: grid; grid-template-columns: repeat(2, 168px); gap: 12px; }
+  .ptitle { width: 358px; font: var(--t-display); }
+  .ptitle small { display: block; font: var(--t-label); color: var(--muted); margin-top: 4px; }
+  .phone .card, .phone .insight, .phone .metric, .phone .svc, .phone .booking, .phone .lb { width: 358px; }
+</style>
+</head>
+<body>
+<div class="page">
+  <h1>100x Fitness — design system specimen</h1>
+  <p class="lede">A non-clinical fitness and recovery app (Flutter, Android first). The home screen uses glanceable hero tiles, the rest uses calm light cards, and there is one guardrailed AI voice. Every colour carries a label. A missing value is never shown as zero. The values on this page are illustrative, not real member data.</p>
+
+  <!-- ================= TOKENS ================= -->
+  <h2>Colour</h2>
+  <h3>Brand & surfaces</h3>
+  <div class="row">
+    <div class="sw"><i style="background:var(--brand)"></i><span>brand<small>#2A6FD6 · 100x Blue</small></span></div>
+    <div class="sw"><i style="background:linear-gradient(180deg,var(--sky-top),var(--sky-bottom))"></i><span>sky gradient<small>home canvas</small></span></div>
+    <div class="sw"><i style="background:var(--canvas);border-bottom:1px solid var(--line)"></i><span>canvas<small>#F6F5FB</small></span></div>
+    <div class="sw"><i style="background:var(--ink)"></i><span>ink<small>#14152A</small></span></div>
+    <div class="sw"><i style="background:var(--muted)"></i><span>muted<small>#6B6F86</small></span></div>
+  </div>
+  <h3>Metric hues (always labelled)</h3>
+  <div class="row">
+    <div class="sw"><i style="background:linear-gradient(90deg,var(--metric-move),var(--metric-move-2),var(--metric-move-3))"></i><span>move<small>rings</small></span></div>
+    <div class="sw"><i style="background:var(--metric-heart)"></i><span>heart<small>#E0243A</small></span></div>
+    <div class="sw"><i style="background:var(--metric-sleep)"></i><span>sleep<small>#4B16D9</small></span></div>
+    <div class="sw"><i style="background:var(--metric-effort)"></i><span>effort<small>#8C96A8</small></span></div>
+    <div class="sw"><i style="background:var(--metric-breathe)"></i><span>breathe<small>#14B8A6</small></span></div>
+  </div>
+
+  <h2>Type</h2>
+  <div class="card" style="max-width:720px;display:grid;gap:10px">
+    <div style="font:var(--t-hero)">51<span class="unit">bpm</span></div>
+    <div style="font:var(--t-display)">Today, 12 October</div>
+    <div style="font:var(--t-title)">Book a recovery session</div>
+    <div style="font:var(--t-value)">6 h 28 m</div>
+    <div style="font:var(--t-body)">Body — 15/21.75 Inter, tabular numerals everywhere a value appears.</div>
+    <div style="font:var(--t-caps);letter-spacing:.06em">RESTING · RANGE · HRV</div>
+  </div>
+
+  <!-- ================= COMPONENTS ================= -->
+  <h2>Hero tiles — home (after Trackable)</h2>
+  <p class="lede">One saturated colour and one oversized glyph per tile, with three label/value rows. Tapping a tile runs a container transform (350 ms, emphasized easing) into the metric's full-bleed detail page.</p>
+  <div class="row" style="margin-top:16px;padding:20px;border-radius:32px;background:linear-gradient(180deg,var(--sky-top),var(--sky-bottom))">
+    <div class="tile t-move">
+      <div class="glyph">
+        <svg width="104" height="104" viewBox="0 0 104 104" fill="none" stroke-linecap="round">
+          <circle cx="52" cy="52" r="46" stroke="#1C3A1F" stroke-width="10"/><circle cx="52" cy="52" r="46" stroke="var(--metric-move)" stroke-width="10" stroke-dasharray="289" stroke-dashoffset="90" transform="rotate(-90 52 52)"/>
+          <circle cx="52" cy="52" r="33" stroke="#2A3A12" stroke-width="10"/><circle cx="52" cy="52" r="33" stroke="var(--metric-move-2)" stroke-width="10" stroke-dasharray="207" stroke-dashoffset="70" transform="rotate(-90 52 52)"/>
+          <circle cx="52" cy="52" r="20" stroke="#0E2E36" stroke-width="10"/><circle cx="52" cy="52" r="20" stroke="var(--metric-move-3)" stroke-width="10" stroke-dasharray="126" stroke-dashoffset="40" transform="rotate(-90 52 52)"/>
+        </svg>
+      </div>
+      <dl><dt>Steps</dt><dd style="color:var(--metric-move)">8,240</dd><dt>Active</dt><dd style="color:var(--metric-move-2)">34 m</dd><dt>Workouts</dt><dd style="color:var(--metric-move-3)">1</dd></dl>
+    </div>
+    <div class="tile t-heart">
+      <div class="glyph">
+        <svg width="112" height="100" viewBox="0 0 24 22"><defs><radialGradient id="hg" cx=".4" cy=".35" r=".8"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#FFD7DC"/></radialGradient></defs><path fill="url(#hg)" d="M12 21s-8.5-5.3-10.6-10.2C-.1 6.7 2.6 2 6.7 2c2.4 0 4.1 1.4 5.3 3.1C13.2 3.4 14.9 2 17.3 2c4.1 0 6.8 4.7 5.3 8.8C20.5 15.7 12 21 12 21z"/></svg>
+        <b style="color:var(--metric-heart);margin-top:-8px">58<small style="color:var(--metric-heart)">resting</small></b>
+      </div>
+      <dl><dt>Range</dt><dd>52–131<span class="unit">bpm</span></dd><dt>HRV</dt><dd>48<span class="unit">ms</span></dd><dt>Trend</dt><dd>Usual</dd></dl>
+    </div>
+    <div class="tile t-sleep">
+      <div class="glyph">
+        <svg width="104" height="104" viewBox="0 0 104 104"><defs><radialGradient id="mg" cx=".4" cy=".35" r=".75"><stop offset="0" stop-color="#C9B6FF"/><stop offset="1" stop-color="#7A4BEA"/></radialGradient></defs><circle cx="52" cy="52" r="48" fill="url(#mg)"/><circle cx="36" cy="40" r="7" fill="#9D7BF2" opacity=".6"/><circle cx="64" cy="66" r="10" fill="#9D7BF2" opacity=".5"/><circle cx="66" cy="34" r="4" fill="#9D7BF2" opacity=".6"/></svg>
+        <b>7<span class="unit">h</span>12<span class="unit">m</span><small>asleep</small></b>
+      </div>
+      <dl><dt>In bed</dt><dd>7 h 50 m</dd><dt>Bedtime</dt><dd>23:20</dd><dt>vs usual</dt><dd>+18 m</dd></dl>
+    </div>
+    <div class="tile t-breathe">
+      <div class="glyph">
+        <svg width="104" height="104" viewBox="0 0 104 104"><circle cx="52" cy="52" r="46" fill="rgba(255,255,255,.12)"/><circle cx="52" cy="52" r="34" fill="rgba(255,255,255,.18)"/><circle cx="52" cy="52" r="22" fill="rgba(255,255,255,.9)"/></svg>
+        <b style="color:#0E6E73;font-size:28px">10<small style="color:#0E6E73">min</small></b>
+      </div>
+      <dl><dt>Today</dt><dd>2 sessions</dd><dt>Streak</dt><dd>6 days</dd><dt>Pattern</dt><dd>Box 4·4</dd></dl>
+    </div>
+    <div class="tile t-sleep t-gap" style="background:#4B3A9A">
+      <div class="glyph"><svg width="104" height="104" viewBox="0 0 104 104"><circle cx="52" cy="52" r="48" fill="#6A5BB8" opacity=".6"/></svg><b>No data</b></div>
+      <dl><dt>Sleep</dt><dd>–</dd><dt>In bed</dt><dd>–</dd><dt>Synced</dt><dd>Not yet</dd></dl>
+    </div>
+  </div>
+
+  <h3>Date travel</h3>
+  <div class="row" style="padding:20px;border-radius:24px;background:linear-gradient(180deg,#5B95DD,var(--sky-bottom));flex-direction:column;align-items:center">
+    <span class="today-pill">Today →</span>
+    <div class="dates">
+      <div class="date"><small>Thu</small><b>9</b></div><div class="date"><small>Fri</small><b>10</b></div>
+      <div class="date on"><small>Sat</small><b>11</b></div><div class="date"><small>Oct</small><b>12</b></div><div class="date"><small>Mon</small><b>13</b></div>
+    </div>
+  </div>
+
+  <h2>Cards — detail & insight (after Bevel)</h2>
+  <div class="row">
+    <div class="card metric">
+      <div><div class="lbl">♥ Resting heart rate</div><div class="val">58<span class="unit">bpm</span></div><div class="st ok">✓ Usual for you</div></div>
+      <svg width="120" height="44" viewBox="0 0 120 44" fill="none"><path d="M2 30 L14 26 L26 31 L38 22 L50 27 L62 18 L74 24 L86 20 L98 26 L110 21" stroke="var(--status-ok)" stroke-width="2" stroke-linejoin="round"/><circle cx="110" cy="21" r="4" fill="var(--status-ok)" stroke="#fff" stroke-width="2"/></svg>
+    </div>
+    <div class="card metric">
+      <div><div class="lbl">∿ HRV</div><div class="val">39<span class="unit">ms</span></div><div class="st watch">▼ Below your usual</div></div>
+      <svg width="120" height="44" viewBox="0 0 120 44" fill="none"><path d="M2 14 L14 18 L26 12 L38 16 L50 14 L62 20 L74 22 L86 26 L98 30 L110 32" stroke="var(--status-watch)" stroke-width="2"/><circle cx="110" cy="32" r="4" fill="var(--status-watch)" stroke="#fff" stroke-width="2"/></svg>
+    </div>
+    <div class="card metric">
+      <div><div class="lbl">☾ Sleep</div><div class="val" style="color:var(--status-gap)">—</div><div class="st gap">○ Not synced yet</div></div>
+      <svg width="120" height="44" viewBox="0 0 120 44" fill="none"><path d="M2 22 H118" stroke="var(--line)" stroke-width="2" stroke-dasharray="4 5"/></svg>
+    </div>
+  </div>
+  <div class="row" style="margin-top:16px">
+    <div class="insight">
+      <h4>🌿 A steadier week</h4>
+      <p>You averaged 7 h 12 m of sleep across the last 5 nights, 25 minutes more than your usual. Your resting heart rate stayed in your normal band, and you hit your step goal on 4 of 7 days.</p>
+      <div class="src">Based on your Health Connect data · Not medical advice</div>
+    </div>
+    <div style="display:grid;gap:12px">
+      <div class="card linkrow"><span>✦ Ask 100x about this</span><span>→</span></div>
+      <div class="nodata"><span>ⓘ Why don't I see sleep data?</span><span>→</span></div>
+      <div class="trio card" style="background:var(--metric-heart);color:#fff">
+        <div><small>Resting</small><b>58</b></div><div><small>Range</small><b>52–131</b></div><div><small>HRV</small><b>48</b></div>
+      </div>
+    </div>
+  </div>
+
+  <h2>Navigation & quick add</h2>
+  <div class="row" style="align-items:flex-end">
+    <div class="navwrap">
+      <nav class="nav"><a class="on">⌂<span>Home</span></a><a>▦<span>Book</span></a><a>◎<span>Circles</span></a><a>❍<span>Breathe</span></a></nav>
+      <button class="fab" aria-label="Quick add">+</button>
+    </div>
+    <div class="sheet">
+      <div class="qa"><i>▦</i>Book a session</div>
+      <div class="qa ai"><i>✦</i>Ask 100x</div>
+      <div class="qa"><i>❍</i>Start breathwork</div>
+      <div class="qa"><i>🏃</i>Log workout</div>
+      <div class="qa"><i>◎</i>Invite to circle</div>
+      <div class="qa"><i>⌚</i>Connect wearable</div>
+    </div>
+  </div>
+
+  <h2>Booking — on-site recovery & therapies</h2>
+  <div class="row">
+    <div style="display:grid;gap:12px">
+      <div class="card svc"><div class="ic" style="background:#FFE9D6">♨</div><div><h4>Infrared sauna</h4><p>30 min · 100x Lounge, HSR Layout</p></div><div class="price">₹1,200<small>Pay at lounge</small></div></div>
+      <div class="card svc"><div class="ic" style="background:#DDF3FF">❄</div><div><h4>Cold plunge</h4><p>15 min · up to 2 per slot</p></div><div class="price">₹800<small>Pay at lounge</small></div></div>
+      <div class="card svc"><div class="ic" style="background:#E8E4FF">◐</div><div><h4>Compression recovery</h4><p>45 min</p></div><div class="price">₹1,000<small>Pay at lounge</small></div></div>
+    </div>
+    <div style="display:grid;gap:12px">
+      <div class="slots">
+        <div class="slot full">07:00<small>Full</small></div><div class="slot">07:30<small>2 left</small></div><div class="slot on">08:00<small>1 left</small></div><div class="slot">08:30<small>2 left</small></div>
+        <div class="slot">17:00<small>2 left</small></div><div class="slot">17:30<small>2 left</small></div><div class="slot full">18:00<small>Full</small></div><div class="slot">18:30<small>1 left</small></div>
+      </div>
+      <button class="btn primary wide">Confirm 08:00 · Sat 11 Oct</button>
+      <div class="card booking"><div class="when"><small>Oct</small><b>11</b></div><div><h4>Cold plunge · 08:00</h4><p>100x Lounge, HSR Layout · Free cancellation until 04:00</p></div></div>
+    </div>
+  </div>
+
+  <h2>Circles — leaderboard</h2>
+  <div class="row">
+    <div style="display:grid;gap:12px">
+      <span class="seg"><span class="on">Steps</span><span>Active min</span><span>Breathwork</span></span>
+      <div class="card lb">
+        <div class="lbr"><span class="rk">1</span><span class="av" style="background:#2A6FD6">PK</span><span class="nm">Priya K<small>Acme · Design</small></span><span class="v">71,420</span></div>
+        <div class="lbr"><span class="rk">2</span><span class="av" style="background:#14B8A6">RS</span><span class="nm">Rohan S<small>Acme · Sales</small></span><span class="v">66,105</span></div>
+        <div class="lbr me"><span class="rk">3</span><span class="av" style="background:#4B16D9">You</span><span class="nm">You<small>+2 places this week</small></span><span class="v">61,880</span></div>
+        <div class="lbr"><span class="rk">4</span><span class="av" style="background:#8C96A8">🦊</span><span class="nm">Quiet Fox<small>Nickname</small></span><span class="v">58,310</span></div>
+      </div>
+      <div class="privacy">🔒 Only effort totals are shared. Your employer sees group totals, never your health data.</div>
+    </div>
+  </div>
+
+  <h2>Breathwork</h2>
+  <div class="row">
+    <div class="orbstage"><div class="orb"></div><div class="phase"><b>Breathe in</b><small>Box 4 · 4 · 4 · 4 — round 3 of 6</small></div></div>
+    <div style="display:grid;gap:12px;align-content:start">
+      <div class="pattern"><span class="chip on">Box 4·4·4·4</span><span class="chip">4·7·8</span><span class="chip">Coherent 5.5</span></div>
+      <div class="card" style="width:358px"><b>Haptics</b> tick on every phase change. <b>Reduced motion</b> swaps the orb animation for a countdown ring.</div>
+    </div>
+  </div>
+
+  <h2>Ask 100x — guardrailed AI chat</h2>
+  <div class="row">
+    <div class="chat">
+      <div class="guard">Wellness guidance from your own data. Not medical advice.</div>
+      <div class="msg me">Slept badly. Should I still do my run?</div>
+      <div class="msg ai">You slept 5 h 40 m last night, about an hour under your usual 6 h 45 m. On days like this, many people swap a hard run for an easy 20-minute walk or a 5-minute box-breathing session. If you feel unwell, check with a doctor.
+        <div class="cite"><span>☾ Sleep · 11 Oct</span><span>♥ Resting HR · usual</span></div></div>
+      <div class="sugg"><span class="chip">Plan an easy day</span><span class="chip">Start box breathing</span><span class="chip">Book a sauna</span></div>
+    </div>
+    <div style="display:grid;gap:12px;align-content:start">
+      <div class="emerg">If you have chest pain, trouble breathing or thoughts of harming yourself, call 112 now. I can't help with emergencies.</div>
+      <div class="msg ai" style="max-width:358px">I can't diagnose conditions or suggest medicines. I can help with sleep habits, activity, recovery and breathwork. You can also book a session with the team at the lounge.</div>
+    </div>
+  </div>
+
+  <h2>Consent & privacy</h2>
+  <div class="row">
+    <div class="card" style="display:grid;gap:16px">
+      <div class="consent"><div><h4>Read activity & sleep</h4><p>Steps, workouts, sleep, heart rate and HRV from Health Connect</p></div><span class="tog"></span></div>
+      <div class="consent"><div><h4>Show me on circle leaderboards</h4><p>Effort totals only. A nickname is allowed.</p></div><span class="tog"></span></div>
+      <div class="consent"><div><h4>Personalised AI insights</h4><p>Your metrics are sent to our AI provider to write insights</p></div><span class="tog off"></span></div>
+    </div>
+  </div>
+
+  <!-- ================= SCREENS ================= -->
+  <h2>Screens</h2>
+  <div class="phones">
+    <!-- Home -->
+    <div class="phone sky">
+      <div class="sb"><span>9:41</span><span>● ● ●</span></div>
+      <div class="body">
+        <div class="hello"><div class="av">A</div><span class="nm">Aarav ›</span></div>
+        <div class="dates" style="margin-bottom:4px"><div class="date"><small>Thu</small><b>9</b></div><div class="date"><small>Fri</small><b>10</b></div><div class="date on"><small>Sat</small><b>11</b></div><div class="date"><small>Sun</small><b>12</b></div><div class="date"><small>Mon</small><b>13</b></div></div>
+        <div class="grid2">
+          <div class="tile t-move"><div class="glyph"><svg width="96" height="96" viewBox="0 0 104 104" fill="none" stroke-linecap="round"><circle cx="52" cy="52" r="46" stroke="#1C3A1F" stroke-width="10"/><circle cx="52" cy="52" r="46" stroke="var(--metric-move)" stroke-width="10" stroke-dasharray="289" stroke-dashoffset="90" transform="rotate(-90 52 52)"/><circle cx="52" cy="52" r="33" stroke="#2A3A12" stroke-width="10"/><circle cx="52" cy="52" r="33" stroke="var(--metric-move-2)" stroke-width="10" stroke-dasharray="207" stroke-dashoffset="70" transform="rotate(-90 52 52)"/><circle cx="52" cy="52" r="20" stroke="#0E2E36" stroke-width="10"/><circle cx="52" cy="52" r="20" stroke="var(--metric-move-3)" stroke-width="10" stroke-dasharray="126" stroke-dashoffset="40" transform="rotate(-90 52 52)"/></svg></div><dl><dt>Steps</dt><dd>8,240</dd><dt>Active</dt><dd>34 m</dd><dt>Workouts</dt><dd>1</dd></dl></div>
+          <div class="tile t-heart"><div class="glyph"><svg width="100" height="90" viewBox="0 0 24 22"><path fill="#fff" d="M12 21s-8.5-5.3-10.6-10.2C-.1 6.7 2.6 2 6.7 2c2.4 0 4.1 1.4 5.3 3.1C13.2 3.4 14.9 2 17.3 2c4.1 0 6.8 4.7 5.3 8.8C20.5 15.7 12 21 12 21z"/></svg><b style="color:var(--metric-heart);margin-top:-8px">58<small style="color:var(--metric-heart)">resting</small></b></div><dl><dt>Range</dt><dd>52–131</dd><dt>HRV</dt><dd>48 ms</dd><dt>Trend</dt><dd>Usual</dd></dl></div>
+          <div class="tile t-sleep"><div class="glyph"><svg width="96" height="96" viewBox="0 0 104 104"><circle cx="52" cy="52" r="48" fill="#8A5EF0"/><circle cx="36" cy="40" r="7" fill="#A88BF5" opacity=".7"/><circle cx="64" cy="66" r="10" fill="#A88BF5" opacity=".6"/></svg><b>7<span class="unit">h</span>12<span class="unit">m</span></b></div><dl><dt>In bed</dt><dd>7 h 50 m</dd><dt>Bedtime</dt><dd>23:20</dd><dt>vs usual</dt><dd>+18 m</dd></dl></div>
+          <div class="tile t-breathe"><div class="glyph"><svg width="96" height="96" viewBox="0 0 104 104"><circle cx="52" cy="52" r="46" fill="rgba(255,255,255,.12)"/><circle cx="52" cy="52" r="34" fill="rgba(255,255,255,.18)"/><circle cx="52" cy="52" r="22" fill="#fff"/></svg><b style="color:#0E6E73;font-size:26px">10<small style="color:#0E6E73">min</small></b></div><dl><dt>Today</dt><dd>2</dd><dt>Streak</dt><dd>6 days</dd><dt>Pattern</dt><dd>Box</dd></dl></div>
+        </div>
+        <div class="card booking" style="color:var(--ink)"><div class="when"><small>Sat</small><b>11</b></div><div><h4>Cold plunge · 08:00</h4><p>100x Lounge, HSR Layout</p></div></div>
+      </div>
+      <div class="dock"><div class="navwrap"><nav class="nav"><a class="on">⌂<span>Home</span></a><a>▦<span>Book</span></a><a>◎<span>Circles</span></a><a>❍<span>Breathe</span></a></nav><button class="fab">+</button></div></div>
+    </div>
+
+    <!-- Book -->
+    <div class="phone">
+      <div class="sb"><span>9:41</span><span>● ● ●</span></div>
+      <div class="body">
+        <div class="ptitle">Book<small>100x Lounge · HSR Layout ⌄</small></div>
+        <div class="dates" style="background:var(--card-sunk)"><div class="date"><small>Thu</small><b>9</b></div><div class="date"><small>Fri</small><b>10</b></div><div class="date on"><small>Sat</small><b>11</b></div><div class="date"><small>Sun</small><b>12</b></div><div class="date"><small>Mon</small><b>13</b></div></div>
+        <div class="card svc"><div class="ic" style="background:#DDF3FF">❄</div><div><h4>Cold plunge</h4><p>15 min · up to 2 per slot</p></div><div class="price">₹800<small>Pay at lounge</small></div></div>
+        <div class="slots"><div class="slot full">07:00<small>Full</small></div><div class="slot">07:30<small>2 left</small></div><div class="slot on">08:00<small>1 left</small></div><div class="slot">08:30<small>2 left</small></div><div class="slot">17:00<small>2 left</small></div><div class="slot">17:30<small>2 left</small></div><div class="slot full">18:00<small>Full</small></div><div class="slot">18:30<small>1 left</small></div></div>
+        <div class="card svc"><div class="ic" style="background:#FFE9D6">♨</div><div><h4>Infrared sauna</h4><p>30 min</p></div><div class="price">₹1,200<small>Pay at lounge</small></div></div>
+        <div class="card svc"><div class="ic" style="background:#E8E4FF">◐</div><div><h4>Compression recovery</h4><p>45 min</p></div><div class="price">₹1,000<small>Pay at lounge</small></div></div>
+        <button class="btn primary wide">Confirm 08:00 · Sat 11 Oct</button>
+      </div>
+    </div>
+
+    <!-- Circles -->
+    <div class="phone">
+      <div class="sb"><span>9:41</span><span>● ● ●</span></div>
+      <div class="body">
+        <div class="ptitle">Acme Corp circle<small>142 members · week of 6 Oct</small></div>
+        <span class="seg"><span class="on">Steps</span><span>Active min</span><span>Breathwork</span></span>
+        <div class="card" style="width:358px;display:grid;grid-template-columns:1fr 1fr;gap:8px"><div><small style="color:var(--muted);font:var(--t-label)">Circle total</small><div style="font:var(--t-value)">8.4M<span class="unit">steps</span></div></div><div><small style="color:var(--muted);font:var(--t-label)">You</small><div style="font:var(--t-value)">#3</div></div></div>
+        <div class="card lb"><div class="lbr"><span class="rk">1</span><span class="av" style="background:#2A6FD6">PK</span><span class="nm">Priya K<small>Design</small></span><span class="v">71,420</span></div><div class="lbr"><span class="rk">2</span><span class="av" style="background:#14B8A6">RS</span><span class="nm">Rohan S<small>Sales</small></span><span class="v">66,105</span></div><div class="lbr me"><span class="rk">3</span><span class="av" style="background:#4B16D9">You</span><span class="nm">You<small>+2 this week</small></span><span class="v">61,880</span></div><div class="lbr"><span class="rk">4</span><span class="av" style="background:#8C96A8">🦊</span><span class="nm">Quiet Fox<small>Nickname</small></span><span class="v">58,310</span></div><div class="lbr"><span class="rk">5</span><span class="av" style="background:#E0243A">MN</span><span class="nm">Meera N<small>Ops</small></span><span class="v">55,960</span></div></div>
+        <div class="privacy">🔒 Effort totals only. Your employer sees circle totals, never your health data.</div>
+      </div>
+      <div class="dock"><div class="navwrap"><nav class="nav"><a>⌂<span>Home</span></a><a>▦<span>Book</span></a><a class="on">◎<span>Circles</span></a><a>❍<span>Breathe</span></a></nav><button class="fab">+</button></div></div>
+    </div>
+
+    <!-- Breathe -->
+    <div class="phone" style="background:radial-gradient(120% 80% at 50% 25%,#2BC8B4 0%,#0E6E73 55%,#0A3A4A 100%);color:#fff">
+      <div class="sb" style="color:#fff"><span>9:41</span><span>● ● ●</span></div>
+      <div class="body" style="align-content:start">
+        <div class="ptitle" style="color:#fff">Box breathing<small style="color:rgba(255,255,255,.75)">4 · 4 · 4 · 4 · 6 rounds · 4 min</small></div>
+        <div style="height:420px;display:grid;place-items:center"><div class="orb" style="width:200px;height:200px"></div></div>
+        <div style="text-align:center"><div style="font:600 26px/1.2 var(--font-display)">Hold</div><div style="opacity:.8;font:var(--t-label)">Round 3 of 6</div></div>
+        <button class="btn" style="background:rgba(255,255,255,.18);color:#fff;width:358px">Pause</button>
+      </div>
+    </div>
+
+    <!-- Ask 100x -->
+    <div class="phone">
+      <div class="sb"><span>9:41</span><span>● ● ●</span></div>
+      <div class="body">
+        <div class="ptitle">Ask 100x<small>Wellness guidance from your data · not medical advice</small></div>
+        <div class="msg me" style="justify-self:end">Slept badly. Should I still do my run?</div>
+        <div class="msg ai" style="max-width:330px">You slept 5 h 40 m, about an hour under your usual. An easy 20-minute walk or a 5-minute box-breathing session may suit today better than a hard run. If you feel unwell, check with a doctor.<div class="cite"><span>☾ Sleep · 11 Oct</span><span>♥ Resting HR · usual</span></div></div>
+        <div class="sugg"><span class="chip">Plan an easy day</span><span class="chip">Start box breathing</span><span class="chip">Book a sauna</span></div>
+      </div>
+      <div class="dock"><div class="card" style="width:358px;border-radius:26px;display:flex;justify-content:space-between;align-items:center;padding:12px 12px 12px 18px;color:var(--muted)">Ask about your sleep, steps, recovery… <span class="btn brand" style="height:40px;padding:0 14px">↑</span></div></div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
