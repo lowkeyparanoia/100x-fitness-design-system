@@ -89,7 +89,7 @@ Frames are in `design/frames/`. The curated set for Claude Design is `design/fra
 1. Absent is not zero. A missing sync is a gap with a "Why no data?" link.
 2. Colour always comes with a word or icon.
 3. No health values in notifications on the lock screen.
-4. Employer and corporate views show **group totals only**, for groups of 5 or more opted-in members.
+4. Employer and corporate views show **group totals only**, for groups of 10 or more opted-in members (100x-build used 5; the legal brief recommends 10).
 5. The AI never diagnoses, never invents a value and never sets a plan. It cites the member's own data.
 6. Touch targets are at least 48 dp. Light and dark modes. Reduced-motion fallbacks.
 7. India context: ₹, Indian phone numbers, IST days.
