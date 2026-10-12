@@ -29,7 +29,7 @@ Home is a **sky-blue gradient with four saturated hero tiles**: Move (rings), He
 1. **Absent is not zero.** A missing sync shows "—" and a "Why don't I see data?" link, never 0.
 2. **Colour never works alone.** Every hue carries a word or icon ("Usual for you", "Below your usual", "Not synced yet").
 3. **No composite health scores in v1.** Show values against the member's *own* usual range, not clinical norms or "Recovery %".
-4. **Employers see group totals only**, and only for circles of 10 or more opted-in members (configurable; 100x-build used 5). Leaderboards rank *effort* (steps, active minutes, breathwork minutes) and allow nicknames.
+4. **Employers see group totals only**, and only for circles of 10 or more opted-in members (configurable; 100x-build used 5). Leaderboards rank *effort* only: steps, active minutes, breathwork minutes, and consistency (days the member hit their own goal). Manually entered records don't count. Nicknames are allowed, and appearing on the board is a separate opt-in from contributing to circle totals.
 5. **AI guardrails, visible in the UI:**
    - A permanent "Wellness guidance · not medical advice" line.
    - Emergency phrases switch to a fixed "call 112" card.
